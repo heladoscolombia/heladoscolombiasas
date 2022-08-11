@@ -16,7 +16,7 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
-    'version': '14.3.10.0.2',
+    'version': '14.3.10.0.3',
     'license': 'OPL-1',
     'support': 'soporte.fe@pragmatic.com.co',
     'price': '99',

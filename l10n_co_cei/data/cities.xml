@@ -1,5 +1,5 @@
 <odoo>
-   <data noupdate="1">
+   <data>
       <record model="l10n_co_cei.city" id="city_1">
             <field name="city_code">05001</field>
             <field name="city_name">MEDELLÍN</field>
@@ -530,9 +530,7 @@
 
       <record model="l10n_co_cei.city" id="city_89">
             <field name="city_code">05647</field>
-            <field name="city_name">SAN ANDRÉS
-DE
-CUERQUÍA</field>
+            <field name="city_name">SAN ANDRÉS DE CUERQUÍA</field>
             <field name="state_id" ref="base.state_co_01"/>
       </record>
 
@@ -556,18 +554,13 @@ CUERQUÍA</field>
 
       <record model="l10n_co_cei.city" id="city_93">
             <field name="city_code">05658</field>
-            <field name="city_name">SAN JOSÉ
-DE
-LA
-MONTAÑA</field>
+            <field name="city_name">SAN JOSÉ DE LA MONTAÑA</field>
             <field name="state_id" ref="base.state_co_01"/>
       </record>
 
       <record model="l10n_co_cei.city" id="city_94">
             <field name="city_code">05659</field>
-            <field name="city_name">SAN JUAN
-DE
-URABÁ</field>
+            <field name="city_name">SAN JUAN DE URABÁ</field>
             <field name="state_id" ref="base.state_co_01"/>
       </record>
 
@@ -579,18 +572,13 @@ URABÁ</field>
 
       <record model="l10n_co_cei.city" id="city_96">
             <field name="city_code">05664</field>
-            <field name="city_name">SAN PEDRO
-DE
-LOS
-MILAGROS</field>
+            <field name="city_name">SAN PEDRO DE LOS MILAGROS</field>
             <field name="state_id" ref="base.state_co_01"/>
       </record>
 
       <record model="l10n_co_cei.city" id="city_97">
             <field name="city_code">05665</field>
-            <field name="city_name">SAN PEDRO
-DE
-URABÁ</field>
+            <field name="city_name">SAN PEDRO DE URABÁ</field>
             <field name="state_id" ref="base.state_co_01"/>
       </record>
 
@@ -620,9 +608,7 @@ URABÁ</field>
 
       <record model="l10n_co_cei.city" id="city_102">
             <field name="city_code">05686</field>
-            <field name="city_name">SANTA ROSA
-DE
-OSOS</field>
+            <field name="city_name">SANTA ROSA DE OSOS</field>
             <field name="state_id" ref="base.state_co_01"/>
       </record>
 
@@ -778,10 +764,7 @@ OSOS</field>
 
       <record model="l10n_co_cei.city" id="city_129">
             <field name="city_code">08137</field>
-            <field name="city_name">CAMPO
-DE
-LA
-CRUZ</field>
+            <field name="city_name">CAMPO DE LA CRUZ</field>
             <field name="state_id" ref="base.state_co_02"/>
       </record>
 
@@ -799,9 +782,7 @@ CRUZ</field>
 
       <record model="l10n_co_cei.city" id="city_132">
             <field name="city_code">08372</field>
-            <field name="city_name">JUAN
-DE
-ACOSTA</field>
+            <field name="city_name">JUAN DE ACOSTA</field>
             <field name="state_id" ref="base.state_co_02"/>
       </record>
 
@@ -825,9 +806,7 @@ ACOSTA</field>
 
       <record model="l10n_co_cei.city" id="city_136">
             <field name="city_code">08520</field>
-            <field name="city_name">PALMAR
-DE
-VARELA</field>
+            <field name="city_name">PALMAR DE VARELA</field>
             <field name="state_id" ref="base.state_co_02"/>
       </record>
 
@@ -953,7 +932,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_157">
             <field name="city_code">13074</field>
-            <field name="city_name">BARRANCO DE LOBAS</field>
+            <field name="city_name">BARRANCO DE LOBA</field>
             <field name="state_id" ref="base.state_co_04"/>
       </record>
 
@@ -1121,7 +1100,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_186">
             <field name="city_code">13670</field>
-            <field name="city_name">SAN PABLO</field>
+            <field name="city_name">SAN PABLO SUR</field>
             <field name="state_id" ref="base.state_co_04"/>
       </record>
 
@@ -1133,7 +1112,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_188">
             <field name="city_code">13683</field>
-            <field name="city_name">SANTA ROSA</field>
+            <field name="city_name">SANTA ROSA DE LIMA</field>
             <field name="state_id" ref="base.state_co_04"/>
       </record>
 
@@ -1481,7 +1460,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_246">
             <field name="city_code">15401</field>
-            <field name="city_name">LA VISTORIA</field>
+            <field name="city_name">LA VICTORIA</field>
             <field name="state_id" ref="base.state_co_05"/>
       </record>
 
@@ -1613,7 +1592,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_268">
             <field name="city_code">15537</field>
-            <field name="city_name">PAZ DEL RÍO</field>
+            <field name="city_name">PAZ DE RÍO</field>
             <field name="state_id" ref="base.state_co_05"/>
       </record>
 
@@ -2159,13 +2138,13 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_360">
             <field name="city_code">18610</field>
-            <field name="city_name">SAN JOSÉ DE FRAGUA</field>
+            <field name="city_name">SAN JOSÉ DEL FRAGUA</field>
             <field name="state_id" ref="base.state_co_07"/>
       </record>
 
       <record model="l10n_co_cei.city" id="city_361">
             <field name="city_code">18753</field>
-            <field name="city_name">SAN VICENTE DE CAGUÁN</field>
+            <field name="city_name">SAN VICENTE DEL CAGUÁN</field>
             <field name="state_id" ref="base.state_co_07"/>
       </record>
 
@@ -3989,7 +3968,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_665">
             <field name="city_code">47170</field>
-            <field name="city_name">CHIVOLO</field>
+            <field name="city_name">CHIBOLO</field>
             <field name="state_id" ref="base.state_co_15"/>
       </record>
 
@@ -4091,13 +4070,13 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_682">
             <field name="city_code">47692</field>
-            <field name="city_name">SAN SEBASTIÁN DE BUENA VISTA</field>
+            <field name="city_name">SAN SEBASTIÁN DE BUENAVISTA</field>
             <field name="state_id" ref="base.state_co_15"/>
       </record>
 
       <record model="l10n_co_cei.city" id="city_683">
             <field name="city_code">47703</field>
-            <field name="city_name">SAN ZEÑÓN</field>
+            <field name="city_name">SAN ZENÓN</field>
             <field name="state_id" ref="base.state_co_15"/>
       </record>
 
@@ -4109,7 +4088,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_685">
             <field name="city_code">47720</field>
-            <field name="city_name">SANTA  BÁRBARA DE PINTO</field>
+            <field name="city_name">SANTA BÁRBARA DE PINTO</field>
             <field name="state_id" ref="base.state_co_15"/>
       </record>
 
@@ -4301,7 +4280,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_717">
             <field name="city_code">50689</field>
-            <field name="city_name">SAN MARTÍN</field>
+            <field name="city_name">SAN MARTÍN DE LOS LLANOS</field>
             <field name="state_id" ref="base.state_co_16"/>
       </record>
 
@@ -4727,7 +4706,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_788">
             <field name="city_code">54125</field>
-            <field name="city_name">CÁCOTA</field>
+            <field name="city_name">CÁCOTA DE VELAZCO</field>
             <field name="state_id" ref="base.state_co_18"/>
       </record>
 
@@ -4817,7 +4796,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_803">
             <field name="city_code">54398</field>
-            <field name="city_name">LA PLAYA</field>
+            <field name="city_name">LA PLAYA DE BELÉN</field>
             <field name="state_id" ref="base.state_co_18"/>
       </record>
 
@@ -4871,7 +4850,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_812">
             <field name="city_code">54660</field>
-            <field name="city_name">SALAZAR</field>
+            <field name="city_name">SALAZAR DE LAS PALMAS</field>
             <field name="state_id" ref="base.state_co_18"/>
       </record>
 
@@ -4901,7 +4880,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_817">
             <field name="city_code">54743</field>
-            <field name="city_name">SILOS</field>
+            <field name="city_name">SANTO DOMINGO DE SILOS</field>
             <field name="state_id" ref="base.state_co_18"/>
       </record>
 
@@ -5243,7 +5222,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_874">
             <field name="city_code">68235</field>
-            <field name="city_name">EL CARMEN DE CHUCURRÍ</field>
+            <field name="city_name">EL CARMEN DE CHUCURÍ</field>
             <field name="state_id" ref="base.state_co_21"/>
       </record>
 
@@ -5357,7 +5336,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_893">
             <field name="city_code">68377</field>
-            <field name="city_name">LA BELLAZA</field>
+            <field name="city_name">LA BELLEZA</field>
             <field name="state_id" ref="base.state_co_21"/>
       </record>
 
@@ -6497,7 +6476,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_1085">
             <field name="city_code">86573</field>
-            <field name="city_name">PUERTO LEGUIZÁMO</field>
+            <field name="city_name">PUERTO LEGUÍZAMO</field>
             <field name="state_id" ref="base.state_co_27"/>
       </record>
 
@@ -6557,7 +6536,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_1095">
             <field name="city_code">91263</field>
-            <field name="city_name">EL DENCANTO</field>
+            <field name="city_name">EL ENCANTO</field>
             <field name="state_id" ref="base.state_co_29"/>
       </record>
 
@@ -6623,7 +6602,7 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_1106">
             <field name="city_code">94343</field>
-            <field name="city_name">BARRANCO MINAS</field>
+            <field name="city_name">BARRANCOMINAS</field>
             <field name="state_id" ref="base.state_co_30"/>
       </record>
 
@@ -6659,13 +6638,13 @@ VARELA</field>
 
       <record model="l10n_co_cei.city" id="city_1112">
             <field name="city_code">94887</field>
-            <field name="city_name">PANA PANA</field>
+            <field name="city_name">PANA</field>
             <field name="state_id" ref="base.state_co_30"/>
       </record>
 
       <record model="l10n_co_cei.city" id="city_1113">
             <field name="city_code">94888</field>
-            <field name="city_name">MORICHAL</field>
+            <field name="city_name">MORICHAL NUEVO</field>
             <field name="state_id" ref="base.state_co_30"/>
       </record>
 
