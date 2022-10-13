@@ -16,7 +16,7 @@
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
     # for the full list
-    'version': '14.3.10.0.3',
+    'version': '14.3.10.0.10',
     'license': 'OPL-1',
     'support': 'soporte.fe@pragmatic.com.co',
     'price': '99',
@@ -41,6 +41,7 @@
         'data/cities.xml',
         'data/cron_envio_a_dian.xml',
         'data/cron_reconsulta_a_dian.xml',
+        'data/cron_events.xml',
         'data/ir_config_parameter.xml',
         'data/ir_sequence.xml',
         'data/main_template_factura.xml',
@@ -77,6 +78,7 @@
         'views/unit_measurement_view.xml',
         'views/product.xml',
         'views/history.xml',
+        'views/events_report.xml',
         # reports
         'reports/invoice_custom.xml',
         'reports/invoice_custom_email.xml',

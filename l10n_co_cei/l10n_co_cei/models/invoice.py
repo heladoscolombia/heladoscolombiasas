@@ -102,6 +102,7 @@ class Invoice(models.Model):
         ]
     )
     es_nota_debito = fields.Boolean(string='¿Es una nota débito?')
+    credit_note_without_reference = fields.Boolean(string='Nota crédito sin factura de referencia')
     credited_invoice_id = fields.Many2one('account.move',string='Factura origen',copy=False)
     es_factura_exportacion = fields.Boolean(string='Factura de exportación')
     es_factura_electronica = fields.Boolean(string='Es una factura electrónica')
@@ -165,70 +166,29 @@ class Invoice(models.Model):
     email_receipt_services = fields.Boolean(string="Email enviado")
     email_express_acceptance = fields.Boolean(string="Email enviado")
 
-    attachment_id_send_acknowledgement_electronic_invoice = fields.Many2one(
-        'ir.attachment',
-        string='Archivo Adjunto',
-        copy=False, tracking=True
-    )
-    attachment_id_electronic_sales_invoice_claim = fields.Many2one(
-        'ir.attachment',
-        string='Archivo Adjunto',
-        copy=False, tracking=True
-    )
-    attachment_id_receipt_services = fields.Many2one(
-        'ir.attachment',
-        string='Archivo Adjunto',
-        copy=False, tracking=True
-    )
-    attachment_id_express_acceptance = fields.Many2one(
-        'ir.attachment',
-        string='Archivo Adjunto',
-        copy=False, tracking=True
-    )
-    attachment_id_tacit_acceptance = fields.Many2one(
-        'ir.attachment',
-        string='Archivo Adjunto',
-        copy=False, tracking=True
-    )
+    attachment_id_send_acknowledgement_electronic_invoice = fields.Many2one('ir.attachment',string='Archivo Adjunto',copy=False, tracking=True)
+    attachment_id_electronic_sales_invoice_claim = fields.Many2one('ir.attachment',string='Archivo Adjunto',copy=False, tracking=True)
+    attachment_id_receipt_services = fields.Many2one('ir.attachment',string='Archivo Adjunto',copy=False, tracking=True)
+    attachment_id_express_acceptance = fields.Many2one('ir.attachment',string='Archivo Adjunto',copy=False, tracking=True)
+    attachment_id_tacit_acceptance = fields.Many2one('ir.attachment',string='Archivo Adjunto',copy=False, tracking=True)
 
-    file_send_acknowledgement_electronic_invoice = fields.Binary(
-        string='Archivo',
-        copy=False,
-        attachment=False,
-        tracking=True
-    )
-    file_electronic_sales_invoice_claim = fields.Binary(
-        string='Archivo',
-        copy=False,
-        attachment=False,
-        tracking=True
-    )
-
-    file_receipt_services = fields.Binary(
-        string='Archivo',
-        copy=False,
-        attachment=False,
-        tracking=True
-    )
-    file_express_acceptance = fields.Binary(
-        string='Archivo',
-        copy=False,
-        attachment=False,
-        tracking=True
-    )
-
-    file_tacit_acceptance = fields.Binary(
-        string='Archivo',
-        copy=False,
-        attachment=False,
-        tracking=True
-    )
+    file_send_acknowledgement_electronic_invoice = fields.Binary(string='Archivo',copy=False,attachment=False,tracking=True)
+    file_electronic_sales_invoice_claim = fields.Binary(string='Archivo',copy=False,attachment=False,tracking=True)
+    file_receipt_services = fields.Binary(string='Archivo',copy=False,attachment=False,tracking=True)
+    file_express_acceptance = fields.Binary(string='Archivo',copy=False,attachment=False,tracking=True)
+    file_tacit_acceptance = fields.Binary(string='Archivo',copy=False,attachment=False,tracking=True)
 
     answer_send_acknowledgement_electronic_invoice = fields.Char(string='Respuesta Dian', copy=False, tracking=True)
     answer_electronic_sales_invoice_claim = fields.Char(string='Respuesta Dian', copy=False, tracking=True)
     answer_receipt_services = fields.Char(string='Respuesta Dian', copy=False, tracking=True)
     answer_express_acceptance = fields.Char(string='Respuesta Dian', copy=False, tracking=True)
     answer_tacit_acceptance = fields.Char(string='Respuesta Dian', copy=False, tracking=True)
+
+    state_send_acknowledgement_electronic_invoice = fields.Char(string='Acuse de recibo', copy=False, tracking=True)
+    state_electronic_sales_invoice_claim = fields.Char(string='Reclamo', copy=False, tracking=True)
+    state_receipt_services = fields.Char(string='Recepción de bienes y servicios', copy=False, tracking=True)
+    state_express_acceptance = fields.Char(string='Aceptación expresa', copy=False, tracking=True)
+    state_tacit_acceptance = fields.Char(string='Aceptación tácita', copy=False, tracking=True)
 
     application_response_cude = fields.Char(string="CUDE ApplicationResponse", tracking=True)
 
@@ -480,9 +440,11 @@ class Invoice(models.Model):
     @api.onchange('invoice_date')
     def compute_fecha_entrega(self):
         if self.invoice_date and not self.fecha_entrega:
-            self.fecha_entrega = datetime.datetime.combine(self.invoice_date, datetime.datetime.now().time())
+            #self.fecha_entrega = datetime.datetime.combine(self.invoice_date, datetime.datetime.now().time())
+            self.fecha_entrega = datetime.datetime.combine(self.invoice_date, datetime.datetime.now(pytz.timezone(str(self.user_id.partner_id.tz))).time())-timedelta(hours=(datetime.datetime.now(pytz.timezone(str(self.user_id.partner_id.tz))).utcoffset().total_seconds()/3600)) if self.user_id.partner_id.tz else datetime.datetime.combine(self.invoice_date, datetime.datetime.now(pytz.timezone('America/Bogota')).time())-timedelta(hours=(datetime.datetime.now(pytz.timezone('America/Bogota')).utcoffset().total_seconds()/3600))
         if self.invoice_date and not self.fecha_xml:
-            self.fecha_xml = datetime.datetime.combine(self.invoice_date, datetime.datetime.now().time())
+            #self.fecha_xml = datetime.datetime.combine(self.invoice_date, datetime.datetime.now().time())
+            self.fecha_xml = datetime.datetime.combine(self.invoice_date, datetime.datetime.now(pytz.timezone(str(self.user_id.partner_id.tz))).time()) - timedelta(hours=(datetime.datetime.now(pytz.timezone(str(self.user_id.partner_id.tz))).utcoffset().total_seconds() / 3600)) if self.user_id.partner_id.tz else datetime.datetime.combine(self.invoice_date, datetime.datetime.now(pytz.timezone('America/Bogota')).time())-timedelta(hours=(datetime.datetime.now(pytz.timezone('America/Bogota')).utcoffset().total_seconds()/3600))
     #endregion
 
     #region Calcula tipo descuento según el código DIAN
@@ -531,6 +493,7 @@ class Invoice(models.Model):
             total_tax = 0.0
             total_tax_currency = 0.0
             total_residual = 0.0
+            total_to_pay = 0.0
             total_residual_currency = 0.0
             total = 0.0
             total_currency = 0.0
@@ -558,6 +521,7 @@ class Invoice(models.Model):
                             total_currency += line.amount_currency
                         elif line.account_id.user_type_id.type in ('receivable', 'payable'):
                             # Residual amount.
+                            total_to_pay += line.balance
                             total_residual += line.amount_residual
                             total_residual_currency += line.amount_residual_currency
                     else:
@@ -588,13 +552,40 @@ class Invoice(models.Model):
             is_paid = currency and currency.is_zero(move.amount_residual) or not move.amount_residual
 
             # Compute 'payment_state'.
-            if move.state == 'posted' and is_paid:
+            '''if move.state == 'posted' and is_paid:
                 if move.id in in_payment_set:
                     move.payment_state = 'in_payment'
                 else:
                     move.payment_state = 'paid'
             else:
                 move.payment_state = 'not_paid'
+            '''
+
+            new_pmt_state = 'not_paid' if move.move_type != 'entry' else False
+
+            if move.is_invoice(include_receipts=True) and move.state == 'posted':
+
+                if currency.is_zero(move.amount_residual):
+                    reconciled_payments = move._get_reconciled_payments()
+                    if not reconciled_payments or all(payment.is_matched for payment in reconciled_payments):
+                        new_pmt_state = 'paid'
+                    else:
+                        new_pmt_state = move._get_invoice_in_payment_state()
+                elif currency.compare_amounts(total_to_pay, total_residual) != 0:
+                    new_pmt_state = 'partial'
+
+            if new_pmt_state == 'paid' and move.move_type in ('in_invoice', 'out_invoice', 'entry'):
+                reverse_type = move.move_type == 'in_invoice' and 'in_refund' or move.move_type == 'out_invoice' and 'out_refund' or 'entry'
+                reverse_moves = self.env['account.move'].search(
+                    [('reversed_entry_id', '=', move.id), ('state', '=', 'posted'), ('move_type', '=', reverse_type)])
+
+                # We only set 'reversed' state in cas of 1 to 1 full reconciliation with a reverse entry; otherwise, we use the regular 'paid' state
+                reverse_moves_full_recs = reverse_moves.mapped('line_ids.full_reconcile_id')
+                if reverse_moves_full_recs.mapped('reconciled_line_ids.move_id').filtered(lambda x: x not in (
+                        reverse_moves + reverse_moves_full_recs.mapped('exchange_move_id'))) == move:
+                    new_pmt_state = 'reversed'
+
+            move.payment_state = new_pmt_state
     # Fin de la Funcionalidad
     #endregion
 
@@ -1072,7 +1063,11 @@ class Invoice(models.Model):
                         invoice.invoice_discount_percent = 0
                         invoice.invoice_discount_text = ''
 
-            invoice.amount_total = (invoice.amount_untaxed + invoice.amount_tax - invoice.invoice_discount + invoice.invoice_charges_freight) if invoice.move_type!='entry' else invoice.amount_total
+            #invoice.amount_total = (invoice.amount_untaxed + invoice.amount_tax - invoice.invoice_discount + invoice.invoice_charges_freight) if invoice.move_type!='entry' else invoice.amount_total
+
+            if invoice.move_type != 'entry':
+                invoice.amount_total = (invoice.amount_untaxed + invoice.amount_tax - invoice.invoice_discount + invoice.invoice_charges_freight)
+
     # Fin Calculo descuento sobre total de factura
     #endregion
 
@@ -1110,7 +1105,7 @@ class Invoice(models.Model):
     @api.depends('company_id')
     def compute_fe_habilitar_facturacion_related(self):
         for invoice in self:
-            invoice.fe_habilitar_facturacion_related = self.company_id.fe_habilitar_facturacion
+            invoice.fe_habilitar_facturacion_related = invoice.company_id.fe_habilitar_facturacion
     #endregion
 
     # region line_discount_function crea línea en el create
@@ -2055,9 +2050,11 @@ class Invoice(models.Model):
         try:
             contacto_compañia = (self.env['res.partner'].search([('id', '=', self.company_id.partner_id.id)]))
             invoice = self
-            self.fecha_xml = datetime.datetime.combine(self.invoice_date, datetime.datetime.now().time())
+            #self.fecha_xml = datetime.datetime.combine(self.invoice_date, datetime.datetime.now().time())
+            self.fecha_xml = datetime.datetime.combine(self.invoice_date, datetime.datetime.now(pytz.timezone(str(self.user_id.partner_id.tz))).time())-timedelta(hours=(datetime.datetime.now(pytz.timezone(str(self.user_id.partner_id.tz))).utcoffset().total_seconds()/3600)) if self.user_id.partner_id.tz else datetime.datetime.combine(self.invoice_date, datetime.datetime.now(pytz.timezone('America/Bogota')).time())-timedelta(hours=(datetime.datetime.now(pytz.timezone('America/Bogota')).utcoffset().total_seconds()/3600))
             if not self.fecha_entrega:
-                self.fecha_entrega = datetime.datetime.combine(self.invoice_date, datetime.datetime.now().time())
+                #self.fecha_entrega = datetime.datetime.combine(self.invoice_date, datetime.datetime.now().time())
+                self.fecha_entrega = datetime.datetime.combine(self.invoice_date, datetime.datetime.now(pytz.timezone(str(self.user_id.partner_id.tz))).time())-timedelta(hours=(datetime.datetime.now(pytz.timezone(str(self.user_id.partner_id.tz))).utcoffset().total_seconds()/3600)) if self.user_id.partner_id.tz else datetime.datetime.combine(self.invoice_date, datetime.datetime.now(pytz.timezone('America/Bogota')).time())-timedelta(hours=(datetime.datetime.now(pytz.timezone('America/Bogota')).utcoffset().total_seconds()/3600))
             if not self.invoice_date_due:
                 self._onchange_invoice_date()
                 self._recompute_payment_terms_lines()
@@ -2188,7 +2185,7 @@ class Invoice(models.Model):
             contador = 1
             total_impuestos=0
             for index, invoice_line_id in enumerate(self.invoice_line_ids):
-                if not invoice_line_id.product_id.enable_charges and invoice_line_id.price_unit>=0:
+                if invoice_line_id.price_unit>=0:
                     if invoice_line_id.price_subtotal != 0:
                         price_subtotal_calc = invoice_line_id.price_subtotal
                     else:
@@ -2257,47 +2254,48 @@ class Invoice(models.Model):
                         discount_percentage = 0
                         base_discount = 0
 
-                    mapa_line={
-                        'id': index + contador,
-                        'product_id': invoice_line_id.product_id.id,
-                        'invoiced_quantity': invoice_line_id.quantity,
-                        'uom_product_id': invoice_line_id.product_uom_id.codigo_fe_dian if invoice_line_id.product_uom_id else False,
-                        'line_extension_amount': invoice_line_id.price_subtotal,
-                        'item_description': saxutils.escape(invoice_line_id.name),
-                        'price': (invoice_line_id.price_subtotal + discount_line)/ invoice_line_id.quantity,
-                        'total_amount_tax': invoice.amount_tax,
-                        'tax_info': tax_info,
-                        'discount': discount_line,
-                        'discount_percentage': discount_percentage,
-                        'base_discount': base_discount,
-                        'discount_text': self.calcular_texto_descuento(invoice_line_id.invoice_discount_text),
-                        'discount_code': invoice_line_id.invoice_discount_text,
-                        'multiplier_discount': discount_percentage,
-                        'line_trade_sample_price': invoice_line_id.line_trade_sample_price,
-                        'line_price_reference': (invoice_line_id.line_price_reference*invoice_line_id.quantity),
-                    }
-                    if invoice_line_id.move_id.usa_aiu and invoice_line_id.product_id and invoice_line_id.product_id.tipo_aiu:
-                        mapa_line.update({'note': 'Contrato de servicios AIU por concepto de: ' + invoice_line_id.move_id.objeto_contrato})
-                    invoice_lines.append(mapa_line)
+                    if not invoice_line_id.product_id.enable_charges:
+                        mapa_line={
+                            'id': index + contador,
+                            'product_id': invoice_line_id.product_id.id,
+                            'invoiced_quantity': invoice_line_id.quantity,
+                            'uom_product_id': invoice_line_id.product_uom_id.codigo_fe_dian if invoice_line_id.product_uom_id else False,
+                            'line_extension_amount': invoice_line_id.price_subtotal,
+                            'item_description': saxutils.escape(invoice_line_id.name),
+                            'price': (invoice_line_id.price_subtotal + discount_line)/ invoice_line_id.quantity,
+                            'total_amount_tax': invoice.amount_tax,
+                            'tax_info': tax_info,
+                            'discount': discount_line,
+                            'discount_percentage': discount_percentage,
+                            'base_discount': base_discount,
+                            'discount_text': self.calcular_texto_descuento(invoice_line_id.invoice_discount_text),
+                            'discount_code': invoice_line_id.invoice_discount_text,
+                            'multiplier_discount': discount_percentage,
+                            'line_trade_sample_price': invoice_line_id.line_trade_sample_price,
+                            'line_price_reference': (invoice_line_id.line_price_reference*invoice_line_id.quantity),
+                        }
+                        if invoice_line_id.move_id.usa_aiu and invoice_line_id.product_id and invoice_line_id.product_id.tipo_aiu:
+                            mapa_line.update({'note': 'Contrato de servicios AIU por concepto de: ' + invoice_line_id.move_id.objeto_contrato})
+                        invoice_lines.append(mapa_line)
 
-                    taxs = 0
-                    if invoice_line_id.tax_ids.ids:
-                        for item in invoice_line_id.tax_ids:
-                            if not item.amount < 0:
-                                taxs += 1
-                                # si existe tax para una linea, entonces el price_subtotal
-                                # de la linea se incluye en tax_exclusive_amount
-                                if taxs > 1:  # si hay mas de un impuesto no se incluye  a la suma del tax_exclusive_amount
-                                    pass
-                                else:
-                                    if line_id.price_subtotal != 0:
-                                        tax_exclusive_amount += invoice_line_id.price_subtotal
+                        taxs = 0
+                        if invoice_line_id.tax_ids.ids:
+                            for item in invoice_line_id.tax_ids:
+                                if not item.amount < 0:
+                                    taxs += 1
+                                    # si existe tax para una linea, entonces el price_subtotal
+                                    # de la linea se incluye en tax_exclusive_amount
+                                    if taxs > 1:  # si hay mas de un impuesto no se incluye  a la suma del tax_exclusive_amount
+                                        pass
                                     else:
-                                        taxes = False
-                                        if invoice_line_id.tax_line_id:
-                                            taxes = invoice_line_id.tax_line_id.compute_all(invoice_line_id.line_price_reference, invoice_line_id.currency_id, invoice_line_id.quantity,product=invoice_line_id.product_id,partner=self.partner_id)
-                                        price_subtotal_calc = taxes['total_excluded'] if taxes else invoice_line_id.quantity * invoice_line_id.line_price_reference
-                                        tax_exclusive_amount += (price_subtotal_calc)
+                                        if line_id.price_subtotal != 0:
+                                            tax_exclusive_amount += invoice_line_id.price_subtotal
+                                        else:
+                                            taxes = False
+                                            if invoice_line_id.tax_line_id:
+                                                taxes = invoice_line_id.tax_line_id.compute_all(invoice_line_id.line_price_reference, invoice_line_id.currency_id, invoice_line_id.quantity,product=invoice_line_id.product_id,partner=self.partner_id)
+                                            price_subtotal_calc = taxes['total_excluded'] if taxes else invoice_line_id.quantity * invoice_line_id.line_price_reference
+                                            tax_exclusive_amount += (price_subtotal_calc)
                 else:
                     contador -= 1
             #fin for
@@ -2584,7 +2582,8 @@ class Invoice(models.Model):
     # region Generar xml nota crédito o nota débito
     def generar_creditnote_xml(self):
         contacto_compañia = (self.env['res.partner'].search([('id', '=', self.company_id.partner_id.id)]))
-        self.fecha_xml = datetime.datetime.combine(self.invoice_date, datetime.datetime.now().time())
+        #self.fecha_xml = datetime.datetime.combine(self.invoice_date, datetime.datetime.now().time())
+        self.fecha_xml = datetime.datetime.combine(self.invoice_date, datetime.datetime.now(pytz.timezone(str(self.user_id.partner_id.tz))).time()) - timedelta(hours=(datetime.datetime.now(pytz.timezone(str(self.user_id.partner_id.tz))).utcoffset().total_seconds() / 3600)) if self.user_id.partner_id.tz else datetime.datetime.combine(self.invoice_date, datetime.datetime.now(pytz.timezone('America/Bogota')).time()) - timedelta(hours=(datetime.datetime.now(pytz.timezone('America/Bogota')).utcoffset().total_seconds() / 3600))
         if not self.invoice_date_due:
             self._onchange_invoice_date()
             self._recompute_payment_terms_lines()
@@ -2717,7 +2716,7 @@ class Invoice(models.Model):
         contador = 0
         total_impuestos = 0
         for index, invoice_line_id in enumerate(self.invoice_line_ids):
-            if not invoice_line_id.product_id.enable_charges and invoice_line_id.price_unit>=0:
+            if invoice_line_id.price_unit>=0:
                 if invoice_line_id.price_subtotal != 0:
                     price_subtotal_calc = invoice_line_id.price_subtotal
                 else:
@@ -2786,48 +2785,49 @@ class Invoice(models.Model):
                     discount_percentage = 0
                     base_discount = 0
 
-                mapa_line={
-                    'id': index + 1,
-                    'product_id': invoice_line_id.product_id.id,
-                    'credited_quantity': invoice_line_id.quantity,
-                    'uom_product_id': invoice_line_id.product_uom_id.codigo_fe_dian if invoice_line_id.product_uom_id else False,
-                    'line_extension_amount': invoice_line_id.price_subtotal,
-                    'item_description': saxutils.escape(invoice_line_id.name),
-                    'price': (invoice_line_id.price_subtotal + discount_line)/ invoice_line_id.quantity,
-                    'total_amount_tax': invoice.amount_tax,
-                    'tax_info': tax_info,
-                    'discount': discount_line,
-                    'discount_text': self.calcular_texto_descuento(invoice_line_id.invoice_discount_text),
-                    'discount_code': invoice_line_id.invoice_discount_text,
-                    'discount_percentage': discount_percentage,
-                    'base_discount': base_discount,
-                    'multiplier_discount': discount_percentage,
-                    'line_trade_sample_price': invoice_line_id.line_trade_sample_price,
-                    'line_price_reference': (invoice_line_id.line_price_reference * invoice_line_id.quantity),
-                }
-                if invoice_line_id.move_id.usa_aiu and invoice_line_id.product_id and invoice_line_id.product_id.tipo_aiu:
-                    mapa_line.update({
-                                         'note': 'Contrato de servicios AIU por concepto de: ' + invoice_line_id.move_id.objeto_contrato})
-                creditnote_lines.append(mapa_line)
+                if not invoice_line_id.product_id.enable_charges:
+                    mapa_line={
+                        'id': index + 1,
+                        'product_id': invoice_line_id.product_id.id,
+                        'credited_quantity': invoice_line_id.quantity,
+                        'uom_product_id': invoice_line_id.product_uom_id.codigo_fe_dian if invoice_line_id.product_uom_id else False,
+                        'line_extension_amount': invoice_line_id.price_subtotal,
+                        'item_description': saxutils.escape(invoice_line_id.name),
+                        'price': (invoice_line_id.price_subtotal + discount_line)/ invoice_line_id.quantity,
+                        'total_amount_tax': invoice.amount_tax,
+                        'tax_info': tax_info,
+                        'discount': discount_line,
+                        'discount_text': self.calcular_texto_descuento(invoice_line_id.invoice_discount_text),
+                        'discount_code': invoice_line_id.invoice_discount_text,
+                        'discount_percentage': discount_percentage,
+                        'base_discount': base_discount,
+                        'multiplier_discount': discount_percentage,
+                        'line_trade_sample_price': invoice_line_id.line_trade_sample_price,
+                        'line_price_reference': (invoice_line_id.line_price_reference * invoice_line_id.quantity),
+                    }
+                    if invoice_line_id.move_id.usa_aiu and invoice_line_id.product_id and invoice_line_id.product_id.tipo_aiu:
+                        mapa_line.update({
+                                             'note': 'Contrato de servicios AIU por concepto de: ' + invoice_line_id.move_id.objeto_contrato})
+                    creditnote_lines.append(mapa_line)
 
-                taxs = 0
-                if invoice_line_id.tax_ids.ids:
-                    for item in invoice_line_id.tax_ids:
-                        if not item.amount < 0:
-                            taxs += 1
-                            # si existe tax para una linea, entonces el price_subtotal
-                            # de la linea se incluye en tax_exclusive_amount
-                            if taxs > 1:  # si hay mas de un impuesto no se incluye  a la suma del tax_exclusive_amount
-                                pass
-                            else:
-                                if line_id.price_subtotal != 0:
-                                    tax_exclusive_amount += invoice_line_id.price_subtotal
+                    taxs = 0
+                    if invoice_line_id.tax_ids.ids:
+                        for item in invoice_line_id.tax_ids:
+                            if not item.amount < 0:
+                                taxs += 1
+                                # si existe tax para una linea, entonces el price_subtotal
+                                # de la linea se incluye en tax_exclusive_amount
+                                if taxs > 1:  # si hay mas de un impuesto no se incluye  a la suma del tax_exclusive_amount
+                                    pass
                                 else:
-                                    taxes = False
-                                    if invoice_line_id.tax_line_id:
-                                        taxes = invoice_line_id.tax_line_id.compute_all(invoice_line_id.line_price_reference, invoice_line_id.currency_id, invoice_line_id.quantity,product=invoice_line_id.product_id,partner=self.partner_id)
-                                    price_subtotal_calc = taxes['total_excluded'] if taxes else invoice_line_id.quantity * invoice_line_id.line_price_reference
-                                    tax_exclusive_amount += (price_subtotal_calc)
+                                    if line_id.price_subtotal != 0:
+                                        tax_exclusive_amount += invoice_line_id.price_subtotal
+                                    else:
+                                        taxes = False
+                                        if invoice_line_id.tax_line_id:
+                                            taxes = invoice_line_id.tax_line_id.compute_all(invoice_line_id.line_price_reference, invoice_line_id.currency_id, invoice_line_id.quantity,product=invoice_line_id.product_id,partner=self.partner_id)
+                                        price_subtotal_calc = taxes['total_excluded'] if taxes else invoice_line_id.quantity * invoice_line_id.line_price_reference
+                                        tax_exclusive_amount += (price_subtotal_calc)
             else:
                 contador -= 1
 
@@ -3114,9 +3114,9 @@ class Invoice(models.Model):
                     self.reversed_entry_id.create_date).strftime('%Y-%m-%d') if self.reversed_entry_id else ''
             else:
 
-                creditnote_fe_data['billing_reference_id'] = self.numero_factura_origen
-                creditnote_fe_data['billing_reference_cufe'] = self.cufe_factura_origen
-                creditnote_fe_data['billing_reference_issue_date'] = self.fecha_factura_origen
+                creditnote_fe_data['billing_reference_id'] = self.numero_factura_origen if self.numero_factura_origen else ''
+                creditnote_fe_data['billing_reference_cufe'] = self.cufe_factura_origen if self.cufe_factura_origen else ''
+                creditnote_fe_data['billing_reference_issue_date'] = self.fecha_factura_origen if self.fecha_factura_origen else ''
             xml_template = self.get_template_str('../templates/creditnote.xml')
             credit_note = Template(xml_template)
             output = credit_note.render(creditnote_fe_data)
@@ -3356,7 +3356,8 @@ class Invoice(models.Model):
             contacto_compañia = (self.env['res.partner'].search([('id', '=', self.company_id.partner_id.id)]))
             invoice = self
             if not self.fecha_xml:
-                self.fecha_xml = datetime.datetime.combine(self.invoice_date, datetime.datetime.now().time())
+                #self.fecha_xml = datetime.datetime.combine(self.invoice_date, datetime.datetime.now().time())
+                self.fecha_xml = datetime.datetime.combine(self.invoice_date, datetime.datetime.now(pytz.timezone(str(self.user_id.partner_id.tz))).time()) - timedelta(hours=(datetime.datetime.now(pytz.timezone(str(self.user_id.partner_id.tz))).utcoffset().total_seconds() / 3600)) if self.user_id.partner_id.tz else datetime.datetime.combine(self.invoice_date, datetime.datetime.now(pytz.timezone('America/Bogota')).time()) - timedelta(hours=(datetime.datetime.now(pytz.timezone('America/Bogota')).utcoffset().total_seconds() / 3600))
             create_date = self._str_to_datetime(self.fecha_xml)
             deliver_date = self._str_to_datetime(self.fecha_entrega)
 
@@ -3450,19 +3451,22 @@ class Invoice(models.Model):
                 elif invoice.partner_id.fe_es_compania == '2':
                     invoice_fe_data['invoice_customer_is_company'] = saxutils.escape(invoice.partner_id.fe_primer_nombre+(" "+invoice.partner_id.fe_segundo_nombre if invoice.partner_id.fe_segundo_nombre else "")+invoice.partner_id.fe_primer_apellido+(" "+invoice.partner_id.fe_segundo_apellido if invoice.partner_id.fe_segundo_apellido else ""))
 
-            invoice_fe_data['envio_fecha_envio'] = self.envio_fe_id.fecha_envio.date()
+            #invoice_fe_data['envio_fecha_envio'] = self.envio_fe_id.fecha_envio.date()
+            invoice_fe_data['envio_fecha_envio'] = self.envio_fe_id.fecha_envio.astimezone(pytz.timezone(str(self.user_id.partner_id.tz))).date()
 
             if self.envio_fe_id.codigo_respuesta_validacion == '00':
                 codigo_respuesta_validacion_attached = '02'
             else:
                 codigo_respuesta_validacion_attached = '04'
             invoice_fe_data['envio_codigo_respuesta_validacion'] = codigo_respuesta_validacion_attached
-            invoice_fe_data['envio_fecha_validacion'] = self.envio_fe_id.fecha_validacion.strftime('%Y-%m-%d')
-            invoice_fe_data['envio_hora_validacion'] = self.envio_fe_id.fecha_validacion.strftime('%H:%M:%S')
+            #invoice_fe_data['envio_fecha_validacion'] = self.envio_fe_id.fecha_validacion.strftime('%Y-%m-%d')
+            invoice_fe_data['envio_fecha_validacion'] = self.envio_fe_id.fecha_validacion.astimezone(pytz.timezone(str(self.user_id.partner_id.tz))).strftime('%Y-%m-%d')
+            #invoice_fe_data['envio_hora_validacion'] = self.envio_fe_id.fecha_validacion.strftime('%H:%M:%S')
+            invoice_fe_data['envio_hora_validacion'] = self.envio_fe_id.fecha_validacion.astimezone(pytz.timezone(str(self.user_id.partner_id.tz))).strftime('%H:%M:%S')
 
             invoice_fe_data['invoice_archivo_factura'] = base64.b64decode(self.file).decode()
-
-            invoice_fe_data['invoice_cude'] = self.cufe
+            invoice_fe_data['invoice_cufe'] = self.cufe
+            invoice_fe_data['invoice_id'] = self.name
 
 
             if self.envio_fe_id.codigo_respuesta_validacion == '00':
@@ -4411,6 +4415,13 @@ class Invoice(models.Model):
         self.sudo().write({'zipped_file': zipped_file})
 
         buff.close()
+        
+        # Solucion ticket FE #4785 y #4928
+        if self.envio_fe_id.archivo_envio:
+            archivo_validacion = base64.b64decode(self.envio_fe_id.archivo_validacion).decode()
+
+            if ('<b:IsValid>false</b:IsValid>' or '<b:StatusCode>99</b:StatusCode>' or 'Rechazo' in archivo_validacion) and validation_code == '00':
+                self.write({'attachment_id': None, 'enviada_por_correo': False})
 
         if not self.attachment_id:
             attachment = self.env['ir.attachment'].create({
@@ -4640,6 +4651,27 @@ class Invoice(models.Model):
             super(Invoice, self).action_invoice_sent()
     # endregion
 
+    def cron_event_register(self):
+        invoice_send_acknowledgement = self.env['account.move'].search(['|',('answer_send_acknowledgement_electronic_invoice','ilike','%LGC01'),('answer_send_acknowledgement_electronic_invoice','ilike','%LGC20')], limit=100)
+        for invoice in invoice_send_acknowledgement:
+            invoice.answer_send_acknowledgement_electronic_invoice = 'Respuesta Dian: Respuesta de evento file_send_acknowledgement_electronic_invoice: IsValid: true StatusCode: 00 StatusDescription: Procesado Correctamente. StatusMessage: La AplicatoinResponse ha sido autorizada.'
+
+        invoice_claim = self.env['account.move'].search(['|',('answer_electronic_sales_invoice_claim', 'ilike', '%LGC01'),('answer_electronic_sales_invoice_claim', 'ilike', '%LGC20')], limit=100)
+        for invoice in invoice_claim:
+            invoice.answer_electronic_sales_invoice_claim = 'Respuesta Dian: Respuesta de evento file_electronic_sales_invoice_claim: IsValid: true StatusCode: 00 StatusDescription: Procesado Correctamente. StatusMessage: La AplicatoinResponse ha sido autorizada.'
+
+        invoice_receipt_services = self.env['account.move'].search(['|',('answer_receipt_services', 'ilike', '%LGC01'),('answer_receipt_services', 'ilike', '%LGC20')], limit=100)
+        for invoice in invoice_receipt_services:
+            invoice.answer_receipt_services = 'Respuesta Dian: Respuesta de evento file_receipt_services: IsValid: true StatusCode: 00 StatusDescription: Procesado Correctamente. StatusMessage: La AplicatoinResponse ha sido autorizada.'
+
+        invoice_express_acceptance = self.env['account.move'].search(['|',('answer_express_acceptance', 'ilike', '%LGC01'),('answer_express_acceptance', 'ilike', '%LGC20')], limit=100)
+        for invoice in invoice_express_acceptance:
+            invoice.answer_express_acceptance = 'Respuesta Dian: Respuesta de evento file_express_acceptance: IsValid: true StatusCode: 00 StatusDescription: Procesado Correctamente. StatusMessage: La AplicatoinResponse ha sido autorizada.'
+
+        invoice_tacit_acceptance = self.env['account.move'].search(['|',('answer_tacit_acceptance', 'ilike', '%LGC01'),('answer_tacit_acceptance', 'ilike', '%LGC20')], limit=100)
+        for invoice in invoice_tacit_acceptance:
+            invoice.answer_tacit_acceptance = 'Respuesta Dian: Respuesta de evento file_tacit_acceptance: IsValid: true StatusCode: 00 StatusDescription: Procesado Correctamente. StatusMessage: La AplicatoinResponse ha sido autorizada.'
+
     def send_acknowledgement_electronic_invoice(self):
         if self.file_send_acknowledgement_electronic_invoice:
             raise ValidationError("No se puede generar el evento acuse de recibo, porque ya se generó anteriormente")
@@ -4736,6 +4768,7 @@ class Invoice(models.Model):
             self.filename_send_acknowledgement_electronic_invoice = prefix+str(consecutivo)
             respuesta, is_valid, validation_code = self.intento_envio_factura_electronica(True, filename,event_name,'030',prefix+str(consecutivo),self.ref)
             self[event_name.replace('file','answer')] = respuesta
+            self[event_name.replace('file', 'state')] = 'OK' if 'Procesado Correctamente' in respuesta else 'Rechazado' if 'errores en campos mandatorios' in respuesta else respuesta
             self.env.cr.commit()
         except Exception as e:
             self[event_name] = None
@@ -4749,17 +4782,13 @@ class Invoice(models.Model):
 
     def electronic_sales_invoice_claim(self):
         if not self.file_send_acknowledgement_electronic_invoice:
-            raise ValidationError(
-                "No se puede generar el evento de reclamo de la factura de venta, porque no se ha generado el acuse de recibo")
+            raise ValidationError("No se puede generar el evento de reclamo de la factura de venta, porque no se ha generado el acuse de recibo")
         if not self.file_receipt_services:
-            raise ValidationError(
-                "No se puede generar el evento de reclamo de la factura de venta, porque no se ha generado el acuse de recibo")
+            raise ValidationError("No se puede generar el evento de reclamo de la factura de venta, porque no se ha generado el acuse de recibo")
         if self.file_electronic_sales_invoice_claim:
-            raise ValidationError(
-                "No se puede generar el evento de reclamo de la factura de venta, porque ya se generó anteriormente")
+            raise ValidationError("No se puede generar el evento de reclamo de la factura de venta, porque ya se generó anteriormente")
         if self.file_express_acceptance:
-            raise ValidationError(
-                "No se puede generar el evento de reclamo de la factura de venta, porque ya se aceptó anteriormente")
+            raise ValidationError("No se puede generar el evento de reclamo de la factura de venta, porque ya se aceptó anteriormente")
 
         user_id = self.env.user
         create_date = datetime.datetime.now()
@@ -4859,6 +4888,7 @@ class Invoice(models.Model):
             self.filename_electronic_sales_invoice_claim = prefix + str(consecutivo)
             respuesta, is_valid, validation_code = self.intento_envio_factura_electronica(True, filename, event_name, '031', prefix + str(consecutivo), self.ref)
             self[event_name.replace('file', 'answer')] = respuesta
+            self[event_name.replace('file', 'state')] = 'OK' if 'Procesado Correctamente' in respuesta else 'Rechazado' if 'errores en campos mandatorios' in respuesta else respuesta
             self.env.cr.commit()
         except Exception as e:
             self[event_name] = None
@@ -4872,11 +4902,9 @@ class Invoice(models.Model):
 
     def receipt_services(self):
         if not self.file_send_acknowledgement_electronic_invoice:
-            raise ValidationError(
-                "No se puede generar el evento de recibo del bien o prestación de servicio, porque no se ha generado el acuse de recibo")
+            raise ValidationError("No se puede generar el evento de recibo del bien o prestación de servicio, porque no se ha generado el acuse de recibo")
         if self.file_receipt_services:
-            raise ValidationError(
-                "No se puede generar el evento de recibo del bien o prestación de servicio, porque ya se generó anteriormente")
+            raise ValidationError("No se puede generar el evento de recibo del bien o prestación de servicio, porque ya se generó anteriormente")
 
         user_id = self.env.user
         create_date = datetime.datetime.now()
@@ -4969,6 +4997,7 @@ class Invoice(models.Model):
             self.filename_receipt_services = prefix + str(consecutivo)
             respuesta, is_valid, validation_code = self.intento_envio_factura_electronica(True, filename, event_name, '032', prefix + str(consecutivo), self.ref)
             self[event_name.replace('file', 'answer')] = respuesta
+            self[event_name.replace('file', 'state')] = 'OK' if 'Procesado Correctamente' in respuesta else 'Rechazado' if 'errores en campos mandatorios' in respuesta else respuesta
             self.env.cr.commit()
         except Exception as e:
             self[event_name] = None
@@ -5082,6 +5111,7 @@ class Invoice(models.Model):
             self.filename_express_acceptance = prefix+str(consecutivo)
             respuesta, is_valid, validation_code = self.intento_envio_factura_electronica(True, filename, event_name,'033',prefix+str(consecutivo),self.ref)
             self[event_name.replace('file', 'answer')] = respuesta
+            self[event_name.replace('file', 'state')] = 'OK' if 'Procesado Correctamente' in respuesta else 'Rechazado' if 'errores en campos mandatorios' in respuesta else respuesta
             self.env.cr.commit()
         except Exception as e:
             self[event_name] = None
@@ -5097,9 +5127,9 @@ class Invoice(models.Model):
         if self.file_tacit_acceptance:
             raise ValidationError("No se puede generar el evento de aceptación tácita, porque ya se generó anteriormente")
         if not self.file_send_acknowledgement_electronic_invoice:
-            raise ValidationError("No se puede generar el evento de aceptación expresa, porque no se ha generado el acuse de recibo")
+            raise ValidationError("No se puede generar el evento de aceptación tácita, porque no se ha generado el acuse de recibo")
         if not self.file_receipt_services:
-            raise ValidationError("No se puede generar el evento de aceptación expresa, porque no se ha generado el acuse de recibo")
+            raise ValidationError("No se puede generar el evento de aceptación tácita, porque no se ha generado recepción de bienes y servicios")
 
         user_id = self.env.user
         create_date = datetime.datetime.now()
@@ -5195,47 +5225,48 @@ class Invoice(models.Model):
         try:
             respuesta, is_valid, validation_code = self.intento_envio_factura_electronica(True, filename, event_name,'034',prefix+str(consecutivo),self.name)
             self[event_name.replace('file', 'answer')] = respuesta
+            self[event_name.replace('file', 'state')] = 'OK' if 'Procesado Correctamente' in respuesta else 'Rechazado' if 'errores en campos mandatorios' in respuesta else respuesta
         except Exception as e:
             self[event_name] = None
             raise ValidationError("Se generó un error en el envio del documento a la DIAN {}".format(e))
 
     def reset_acknowledgement_electronic_invoice(self):
-        if (self.answer_send_acknowledgement_electronic_invoice and 'Procesado Correctamente' not in self.answer_send_acknowledgement_electronic_invoice) or (self.file_send_acknowledgement_electronic_invoice and not self.answer_send_acknowledgement_electronic_invoice):
+        if (self.answer_send_acknowledgement_electronic_invoice and 'Procesado Correctamente' not in self.answer_send_acknowledgement_electronic_invoice and 'Evento registrado previamente' not in self.answer_send_acknowledgement_electronic_invoice) or (self.file_send_acknowledgement_electronic_invoice and not self.answer_send_acknowledgement_electronic_invoice):
             self.file_send_acknowledgement_electronic_invoice = None
             self.answer_send_acknowledgement_electronic_invoice = None
         else:
             raise ValidationError("No es posible eliminar el evento porque ya está procesado correctamente")
 
     def reset_electronic_sales_invoice_claim(self):
-        if (self.answer_electronic_sales_invoice_claim and 'Procesado Correctamente' not in self.answer_electronic_sales_invoice_claim) or (self.file_electronic_sales_invoice_claim and not self.answer_electronic_sales_invoice_claim):
+        if (self.answer_electronic_sales_invoice_claim and 'Procesado Correctamente' not in self.answer_electronic_sales_invoice_claim and 'Evento registrado previamente' not in self.answer_electronic_sales_invoice_claim) or (self.file_electronic_sales_invoice_claim and not self.answer_electronic_sales_invoice_claim):
             self.file_electronic_sales_invoice_claim = None
             self.answer_electronic_sales_invoice_claim = None
         else:
             raise ValidationError("No es posible eliminar el evento porque ya está procesado correctamente")
 
     def reset_receipt_services(self):
-        if (self.answer_receipt_services and 'Procesado Correctamente' not in self.answer_receipt_services) or (self.file_receipt_services and not self.answer_receipt_services):
+        if (self.answer_receipt_services and 'Procesado Correctamente' not in self.answer_receipt_services and 'Evento registrado previamente' not in self.answer_receipt_services) or (self.file_receipt_services and not self.answer_receipt_services):
             self.file_receipt_services = None
             self.answer_receipt_services = None
         else:
             raise ValidationError("No es posible eliminar el evento porque ya está procesado correctamente")
 
     def reset_express_acceptance(self):
-        if (self.answer_express_acceptance and 'Procesado Correctamente' not in self.answer_express_acceptance) or (self.file_express_acceptance and not self.answer_express_acceptance):
+        if (self.answer_express_acceptance and 'Procesado Correctamente' not in self.answer_express_acceptance and 'Evento registrado previamente' not in self.answer_express_acceptance) or (self.file_express_acceptance and not self.answer_express_acceptance):
             self.file_express_acceptance = None
             self.answer_express_acceptance = None
         else:
             raise ValidationError("No es posible eliminar el evento porque ya está procesado correctamente")
 
     def reset_tacit_acceptance(self):
-        if (self.answer_tacit_acceptance and 'Procesado Correctamente' not in self.answer_tacit_acceptance) or (self.file_tacit_acceptance and not self.answer_tacit_acceptance):
+        if (self.answer_tacit_acceptance and 'Procesado Correctamente' not in self.answer_tacit_acceptance and 'Evento registrado previamente' not in self.answer_tacit_acceptance) or (self.file_tacit_acceptance and not self.answer_tacit_acceptance):
             self.file_tacit_acceptance = None
             self.answer_tacit_acceptance = None
         else:
             raise ValidationError("No es posible eliminar el evento porque ya está procesado correctamente")
 
     def send_email_acknowledgement_electronic_invoice(self):
-        if (self.answer_send_acknowledgement_electronic_invoice and 'Procesado Correctamente' not in self.answer_send_acknowledgement_electronic_invoice) or not self.answer_send_acknowledgement_electronic_invoice:
+        if (self.answer_send_acknowledgement_electronic_invoice and 'Procesado Correctamente' not in self.answer_send_acknowledgement_electronic_invoice and 'Evento registrado previamente' not in self.answer_send_acknowledgement_electronic_invoice) or not self.answer_send_acknowledgement_electronic_invoice:
             raise ValidationError("No es posible reenviar correo del el evento porque no está procesado correctamente")
         else:
             try:
@@ -5246,7 +5277,7 @@ class Invoice(models.Model):
                 raise ValidationError("No fue posible enviar el correo: {}".format(e))
 
     def send_email_electronic_sales_invoice_claim(self):
-        if (self.answer_electronic_sales_invoice_claim and 'Procesado Correctamente' not in self.answer_electronic_sales_invoice_claim) or not self.answer_electronic_sales_invoice_claim:
+        if (self.answer_electronic_sales_invoice_claim and 'Procesado Correctamente' not in self.answer_electronic_sales_invoice_claim and 'Evento registrado previamente' not in self.answer_electronic_sales_invoice_claim) or not self.answer_electronic_sales_invoice_claim:
             raise ValidationError("No es posible reenviar correo del el evento porque no está procesado correctamente")
         else:
             try:
@@ -5257,7 +5288,7 @@ class Invoice(models.Model):
                 raise ValidationError("No fue posible enviar el correo: {}".format(e))
 
     def send_email_receipt_services(self):
-        if (self.answer_receipt_services and 'Procesado Correctamente' not in self.answer_receipt_services) or not self.answer_receipt_services:
+        if (self.answer_receipt_services and 'Procesado Correctamente' not in self.answer_receipt_services and 'Evento registrado previamente' not in self.answer_receipt_services) or not self.answer_receipt_services:
             raise ValidationError("No es posible reenviar correo del el evento porque no está procesado correctamente")
         else:
             try:
@@ -5268,7 +5299,7 @@ class Invoice(models.Model):
                 raise ValidationError("No fue posible enviar el correo: {}".format(e))
 
     def send_email_express_acceptance(self):
-        if (self.answer_express_acceptance and 'Procesado Correctamente' not in self.answer_express_acceptance) or not self.answer_express_acceptance:
+        if (self.answer_express_acceptance and 'Procesado Correctamente' not in self.answer_express_acceptance and 'Evento registrado previamente' not in self.answer_express_acceptance) or not self.answer_express_acceptance:
             raise ValidationError("No es posible reenviar correo del el evento porque no está procesado correctamente")
         else:
             try:

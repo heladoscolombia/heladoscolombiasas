@@ -65,7 +65,9 @@
       <cac:InvoiceDocumentReference>
          <cbc:ID>{{billing_reference_id}}</cbc:ID>
          <cbc:UUID schemeName="CUFE-SHA384">{{billing_reference_cufe}}</cbc:UUID>
+         {% if billing_reference_issue_date != '' %}
          <cbc:IssueDate>{{billing_reference_issue_date}}</cbc:IssueDate>
+         {% endif %}
       </cac:InvoiceDocumentReference>
    </cac:BillingReference>
    {% if despatch_document_reference and despatch_document_reference_date  %}

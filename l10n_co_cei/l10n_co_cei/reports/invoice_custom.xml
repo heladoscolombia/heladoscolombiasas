@@ -545,7 +545,7 @@
                                                     </t>
                                                     <th width="12%" class="text-right">Valor Unidad</th>
                                                     <th width="12%" class="text-right">Valor de referencia por Unidad</th>
-                                                    <th width="12%" class="text-right">% IVA</th>
+                                                    <th width="12%" class="text-right">% Impuesto</th>
                                                     <th width="12%" class="text-right">% Desc.</th>
                                                     <th width="15%" class="text-right">Valor Total</th>
                                                 </tr>
@@ -583,11 +583,15 @@
                                                                 <t t-if="o.currency_id.name == 'COP' " t-esc="'$'"/>
                                                                 <t t-if="o.currency_id.name != 'COP' " t-esc="o.currency_id.name"/>
                                                                 <t t-esc="'{0:,.2f}'.format(l.line_price_reference)"/>
-                                                            </td>
+                                                        </td>
                                                         <td class="text-right">
                                                             <t t-foreach="l.tax_ids" t-as="tx">
-                                                                <t t-if="tx.amount&gt;=0"
-                                                                   t-esc="'{:,}'.format(int(tx.amount))"/>
+                                                                <t t-if="tx.amount&gt;=0">
+                                                                    <t t-esc="'{}%'.format(int(tx.amount))"/>
+                                                                    <t t-if="len(l.tax_ids)-1 != tx_index">
+                                                                        <t t-esc="'&#032;|&#032;&#032;&#032;'"/>
+                                                                    </t>
+                                                                </t>
                                                             </t>
                                                         </td>
                                                         <td class="text-right">

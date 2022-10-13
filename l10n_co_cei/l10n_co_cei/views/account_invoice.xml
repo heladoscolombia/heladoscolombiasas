@@ -59,9 +59,11 @@
                     </xpath>
                     <xpath expr="//form/sheet/group[1]/group[1]/field[@name='ref']" position="after">
                         <!-- Nota debito otro sistema -->
-                        <field name='numero_factura_origen' attrs="{'invisible': ['|',('move_type', '!=', 'out_refund'),('reversed_entry_id','!=',False)],'required': [('move_type', '=', 'out_refund'),('reversed_entry_id','=',False)]}"/>
-                        <field name='cufe_factura_origen' attrs="{'invisible': ['|',('move_type', '!=', 'out_refund'),('reversed_entry_id','!=',False)],'required': [('move_type', '=', 'out_refund'),('reversed_entry_id','=',False)]}"/>
-                        <field name='fecha_factura_origen' attrs="{'invisible': ['|',('move_type', '!=', 'out_refund'),('reversed_entry_id','!=',False)],'required': [('move_type', '=', 'out_refund'),('reversed_entry_id','=',False)]}"/>
+
+                        <field name='credit_note_without_reference' attrs="{'invisible': ['|',('move_type', '!=', 'out_refund'),('reversed_entry_id','!=',False)]}"/>
+                        <field name='numero_factura_origen' attrs="{'invisible': ['|',('move_type', '!=', 'out_refund'),('reversed_entry_id','!=',False)],'required': [('move_type', '=', 'out_refund'),('reversed_entry_id','=',False),('credit_note_without_reference','!=',True)]}"/>
+                        <field name='cufe_factura_origen' attrs="{'invisible': ['|',('move_type', '!=', 'out_refund'),('reversed_entry_id','!=',False)],'required': [('move_type', '=', 'out_refund'),('reversed_entry_id','=',False),('credit_note_without_reference','!=',True)]}"/>
+                        <field name='fecha_factura_origen' attrs="{'invisible': ['|',('move_type', '!=', 'out_refund'),('reversed_entry_id','!=',False)],'required': [('move_type', '=', 'out_refund'),('reversed_entry_id','=',False),('credit_note_without_reference','!=',True)]}"/>
 
                          <!--AIU-->
                         <field name="usa_aiu"/>
