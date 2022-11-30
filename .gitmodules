@@ -1,0 +1,4 @@
+[submodule "l10n_co_esd"]
+	path = l10n_co_esd
+	url = git@github.com:Pragmatic-Colombia/l10n_co_esd.git
+	branch = 14.0
