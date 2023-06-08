@@ -1,8 +1,18 @@
+<<<<<<< HEAD
 [submodule "l10n_co_cei"]
 	path = l10n_co_cei
 	url = git@github.com:Pragmatic-Colombia/l10n_co_cei.git
 	branch = 14.0
+=======
+>>>>>>> 05f3df155a640198b74d9a73893b8db69f224fc7
 [submodule "l10n_co_esd"]
 	path = l10n_co_esd
 	url = git@github.com:Pragmatic-Colombia/l10n_co_esd.git
 	branch = 14.0
+<<<<<<< HEAD
+=======
+[submodule "l10n_co_cei"]
+	path = l10n_co_cei
+	url = git@github.com:Pragmatic-Colombia/l10n_co_cei.git
+	branch = 14.0
+>>>>>>> 05f3df155a640198b74d9a73893b8db69f224fc7
